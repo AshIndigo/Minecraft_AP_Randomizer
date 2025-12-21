@@ -7,7 +7,10 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.monster.Phantom;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
@@ -29,7 +32,7 @@ public class PhantomTrap implements Trap {
     @Override
     public void trigger(ServerPlayer player) {
         APRandomizer.getServer().execute(() -> {
-            ServerLevel world = (ServerLevel) player.level();
+            ServerLevel world = player.getLevel();
             Vec3 pos = player.position();
             for (int i = 0; i < 3; i++) {
                 Phantom phantom = EntityType.PHANTOM.create(world);

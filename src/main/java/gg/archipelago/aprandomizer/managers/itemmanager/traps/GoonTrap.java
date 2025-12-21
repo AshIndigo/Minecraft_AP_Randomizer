@@ -2,9 +2,12 @@ package gg.archipelago.aprandomizer.managers.itemmanager.traps;
 
 import gg.archipelago.aprandomizer.APRandomizer;
 import gg.archipelago.aprandomizer.common.Utils.Utils;
+import gg.archipelago.aprandomizer.managers.advancementmanager.CustomAdvancementHandler;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EntityEvent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
@@ -14,6 +17,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.ArrayList;
@@ -25,6 +30,7 @@ public class GoonTrap implements Trap {
     private final int numberOfGoons;
     List<Zombie> zombies = new ArrayList<>();
 
+    List<ServerPlayer> players = new LinkedList<>();
     int timer = 20 * 30;
 
     public GoonTrap() {
@@ -39,9 +45,10 @@ public class GoonTrap implements Trap {
     public void trigger(ServerPlayer player) {
         ItemStack fish = new ItemStack(Items.SALMON);
         fish.enchant(Enchantments.KNOCKBACK,3);
+        players.addAll(APRandomizer.getServer().getPlayerList().getPlayers());
 
         APRandomizer.getServer().execute(() -> {
-            ServerLevel world = (ServerLevel) player.level();
+            ServerLevel world = player.getLevel();
             Vec3 pos = player.position();
             for (int i = 0; i < numberOfGoons; i++) {
                 Zombie goon = EntityType.ZOMBIE.create(world);
@@ -58,6 +65,15 @@ public class GoonTrap implements Trap {
     }
 
     @SubscribeEvent
+    public void onDamage(LivingHurtEvent event) {
+        if(event.getSource().getEntity() == null || !(event.getEntity() instanceof ServerPlayer))
+            return;
+        if(event.getSource().getEntity().getType().equals(EntityType.ZOMBIE)) {
+            players.remove(event.getEntity());
+        }
+    }
+
+    @SubscribeEvent
     public void onTick(TickEvent.ServerTickEvent event) {
         if (--timer > 0)
             return;
@@ -65,7 +81,9 @@ public class GoonTrap implements Trap {
         for (Zombie zombie : zombies) {
             zombie.kill();
         }
-
+        for (ServerPlayer player : players) {
+            CustomAdvancementHandler.grantAdvancement(player,new ResourceLocation(APRandomizer.MODID,"archipelago/dodge_fish"));
+        }
         MinecraftForge.EVENT_BUS.unregister(this);
     }
 }
