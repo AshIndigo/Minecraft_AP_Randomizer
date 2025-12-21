@@ -8,7 +8,6 @@ import io.github.archipelagomw.ClientStatus;
 import io.github.archipelagomw.events.ArchipelagoEventListener;
 import io.github.archipelagomw.events.ConnectionResultEvent;
 import io.github.archipelagomw.network.ConnectionResult;
-import net.minecraft.server.level.ServerPlayer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,14 +32,12 @@ public class ConnectResult {
             //give our item manager the list of received items to give to players as they log in.
             APRandomizer.getItemManager().setReceivedItems(client.getItemManager().getReceivedItemIDs());
 
-            if(APRandomizer.getServer().getPlayerList().getPlayers().size() >= 1) {
+            if(!APRandomizer.getServer().getPlayerList().getPlayers().isEmpty()) {
                 APRandomizer.getAP().setGameState(ClientStatus.CLIENT_READY);
             }
 
             //catch up all connected players to the list just received.
-            APRandomizer.server.execute(() -> {
-                APRandomizer.getGoalManager().updateInfoBar();
-            });
+            APRandomizer.server.execute(() -> APRandomizer.getGoalManager().updateInfoBar());
 
         } else if (event.getResult() == ConnectionResult.InvalidPassword) {
             Utils.sendMessageToAll("Invalid Password.");

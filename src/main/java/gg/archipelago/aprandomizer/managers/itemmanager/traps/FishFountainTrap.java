@@ -5,7 +5,6 @@ import gg.archipelago.aprandomizer.common.Utils.Utils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.animal.TropicalFish;
 import net.minecraft.world.entity.monster.Silverfish;
 import net.minecraft.world.phys.Vec3;
 

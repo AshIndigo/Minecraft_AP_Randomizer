@@ -27,13 +27,13 @@ import java.util.Collections;
 public class Utils {
     // Directly reference a log4j logger.
     private static final Logger LOGGER = LogManager.getLogger();
+    private static final MinecraftServer server = APRandomizer.getServer();
+
     /**
      * @param source command source to send the message.
      * @param Message Message to send
      * send a message to whoever ran the command.
      */
-
-    private static final MinecraftServer server = APRandomizer.getServer();
 
     public static void SendMessage(CommandSourceStack source, String Message) {
         try {
@@ -50,9 +50,7 @@ public class Utils {
 
     public static void sendMessageToAll(Component message) {
         //tell the server to send the message in a thread safe way.
-        server.execute(() -> {
-            server.getPlayerList().broadcastSystemMessage(message, false);
-        });
+        server.execute(() -> server.getPlayerList().broadcastSystemMessage(message, false));
 
     }
 
@@ -60,9 +58,7 @@ public class Utils {
         Component message = Utils.apPrintToTextComponent(apPrint);
 
         //tell the server to send the message in a thread safe way.
-        server.execute(() -> {
-            server.getPlayerList().broadcastSystemMessage(message, false);
-        });
+        server.execute(() -> server.getPlayerList().broadcastSystemMessage(message, false));
 
     }
 
@@ -106,21 +102,15 @@ public class Utils {
     }
 
     public static void sendTitleToAll(Component title, Component subTitle, int fadeIn, int stay, int fadeOut) {
-        server.execute(() -> {
-            TitleQueue.queueTitle(new QueuedTitle(server.getPlayerList().getPlayers(), fadeIn, stay, fadeOut, subTitle, title));
-        });
+        server.execute(() -> TitleQueue.queueTitle(new QueuedTitle(server.getPlayerList().getPlayers(), fadeIn, stay, fadeOut, subTitle, title)));
     }
 
     public static void sendTitleToAll(Component title, Component subTitle, Component chatMessage, int fadeIn, int stay, int fadeOut) {
-        server.execute(() -> {
-            TitleQueue.queueTitle(new QueuedTitle(server.getPlayerList().getPlayers(), fadeIn, stay, fadeOut, subTitle, title, chatMessage));
-        });
+        server.execute(() -> TitleQueue.queueTitle(new QueuedTitle(server.getPlayerList().getPlayers(), fadeIn, stay, fadeOut, subTitle, title, chatMessage)));
     }
 
     public static void sendActionBarToAll(String actionBarMessage) {
-        server.execute(() -> {
-            TitleUtils.showActionBar(server.getPlayerList().getPlayers(), Component.literal(actionBarMessage));
-        });
+        server.execute(() -> TitleUtils.showActionBar(server.getPlayerList().getPlayers(), Component.literal(actionBarMessage)));
     }
 
     public static void sendActionBarToPlayer(ServerPlayer player, String actionBarMessage) {

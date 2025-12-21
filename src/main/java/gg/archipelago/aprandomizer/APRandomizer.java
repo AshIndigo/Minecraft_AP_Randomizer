@@ -155,7 +155,7 @@ public class APRandomizer {
     @SubscribeEvent
     public void onServerAboutToStart(ServerAboutToStartEvent event) {
         if (apmcData.state != APMCData.State.VALID) {
-            LOGGER.error("invalid APMC file. Reason: " + apmcData.state);
+            LOGGER.error("invalid APMC file. Reason: {}", apmcData.state);
         }
         server = event.getServer();
     }

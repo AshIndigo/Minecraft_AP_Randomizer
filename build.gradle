@@ -158,12 +158,16 @@ dependencies {
 
 
     shade 'io.github.archipelagomw:Java-Client:0.2.0'
-    shade 'org.apache.httpcomponents.core5:httpcore5-parent:5.3.6'
+    //shade 'org.apache.httpcomponents.core5:httpcore5-parent:5.3.6'
     //shade project(path: ':APClient')
     annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
 }
 
 shadowJar {
+    dependencies {
+        exclude(dependency('com.google.code.gson:gson'))
+        exclude(dependency('org.slf4j:slf4j-api'))
+    }
     archiveClassifier = ''
     configurations = [project.configurations.shade]
     finalizedBy 'reobfShadowJar'
