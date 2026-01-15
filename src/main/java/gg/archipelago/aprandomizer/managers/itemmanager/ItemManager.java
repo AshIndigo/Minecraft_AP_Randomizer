@@ -268,7 +268,7 @@ public class ItemManager {
             if (!carriedItem.isEmpty()) {
                 String ckey = carriedItem.getOrCreateTag().getString("key");
                 if (!ckey.isBlank()) {
-                    if (!carriedItem.sameItem(permanentItems.get(ckey))) {
+                    if (!carriedItem.sameItem(permanentItems.getOrDefault(ckey, ItemStack.EMPTY))) {
                         player.containerMenu.setCarried(permanentItems.get(ckey).copy());
                     }
                     foundItems.add(ckey);
