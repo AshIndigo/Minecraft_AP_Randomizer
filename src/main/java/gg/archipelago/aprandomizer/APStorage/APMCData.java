@@ -23,6 +23,9 @@ public class APMCData {
     @SerializedName("port")
     public int port;
 
+    @SerializedName("chunk_count")
+    public int chunk_count = 1;
+
     public State state = State.VALID;
 
     public enum State {

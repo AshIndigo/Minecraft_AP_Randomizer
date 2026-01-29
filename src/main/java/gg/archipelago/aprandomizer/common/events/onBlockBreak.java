@@ -40,8 +40,13 @@ public class onBlockBreak {
 
         if(event.getPlayer().getMainHandItem().getOrCreateTag().getBoolean("truepick")) {
             int layer = event.getPos().getY();
-            for (int x = 0; x <= 15; x++) {
-                for (int z = 0; z <= 15; z++) {
+            // Clear only the chunk the player is standing in
+            int cx = (int) Math.floor(event.getPos().getX() / 16.0);
+            int cz = (int) Math.floor(event.getPos().getZ() / 16.0);
+            int ox = cx * 16;
+            int oz = cz * 16;
+            for (int x = ox; x < ox + 16; x++) {
+                for (int z = oz; z < oz + 16; z++) {
                     event.getLevel().destroyBlock(new BlockPos(x, layer, z),true);
                 }
             }

@@ -29,10 +29,14 @@ public class GoalManager {
         initializeInfoBar();
     }
 
+    private int getTotalChecks() {
+        return Math.max(apmc.chunk_count, 1) * 192;
+    }
+
     public void initializeInfoBar() {
         CustomBossEvents bossInfoManager = APRandomizer.getServer().getCustomBossEvents();
         layerDugBar = bossInfoManager.create(new ResourceLocation(APRandomizer.MODID,"layer-dug-bar"), Component.literal(""));
-        layerDugBar.setMax(192);
+        layerDugBar.setMax(getTotalChecks());
         layerDugBar.setColor(BossEvent.BossBarColor.BLUE);
         layerDugBar.setOverlay(BossEvent.BossBarOverlay.NOTCHED_10);
 
@@ -67,7 +71,7 @@ public class GoalManager {
         connectionInfoBar.setVisible(!APRandomizer.isConnected());
         layerDugBar.setVisible(!APRandomizer.isJailPlayers());
 
-        layerDugBar.setName(Component.literal("Layers Dug (" + layerManager.getFinishedAmount() + "/192)"));
+        layerDugBar.setName(Component.literal("Layers Dug (" + layerManager.getFinishedAmount() + "/" + getTotalChecks() + ")"));
 
     }
 
@@ -75,7 +79,7 @@ public class GoalManager {
         if(!APRandomizer.isConnected())
             return;
 
-        if(layerManager.getFinishedAmount() >= 192) {
+        if(layerManager.getFinishedAmount() >= getTotalChecks()) {
             APRandomizer.getAP().setGameState(ClientStatus.CLIENT_GOAL);
         }
     }
