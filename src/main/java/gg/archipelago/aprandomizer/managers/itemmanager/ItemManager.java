@@ -36,6 +36,8 @@ public class ItemManager {
 
     private final HashMap<Long, ProgressiveList<PermanentInterface>> progressiveItems = new HashMap<>() {{
         put(index++, new ProgressiveList<>() {{ //progressive pick
+            add(new PermanentItem(new ItemStack(Items.WOODEN_PICKAXE), "pick"));
+            add(new PermanentItem(new ItemStack(Items.STONE_PICKAXE), "pick"));
             add(new PermanentItem(new ItemStack(Items.IRON_PICKAXE), "pick"));
             add(new PermanentItem(new ItemStack(Items.DIAMOND_PICKAXE), "pick"));
 
@@ -54,12 +56,10 @@ public class ItemManager {
             ItemStack eff9 = new ItemStack(Items.NETHERITE_PICKAXE);
             eff9.enchant(Enchantments.BLOCK_EFFICIENCY, 9);
             add(new PermanentItem(eff9, "pick"));
-
-            ItemStack eff11 = new ItemStack(Items.NETHERITE_PICKAXE);
-            eff11.enchant(Enchantments.BLOCK_EFFICIENCY, 11);
-            add(new PermanentItem(eff11, "pick"));
         }});
         put(index++, new ProgressiveList<>() {{ //progressive shovel
+            add(new PermanentItem(new ItemStack(Items.WOODEN_SHOVEL), "shovel"));
+            add(new PermanentItem(new ItemStack(Items.STONE_SHOVEL), "shovel"));
             add(new PermanentItem(new ItemStack(Items.IRON_SHOVEL), "shovel"));
             add(new PermanentItem(new ItemStack(Items.DIAMOND_SHOVEL), "shovel"));
 
