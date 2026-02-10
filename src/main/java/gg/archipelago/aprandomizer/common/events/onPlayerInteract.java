@@ -26,24 +26,27 @@ public class onPlayerInteract {
             return;
         }
 
+        int side = APRandomizer.getChunkSide();
         LevelChunk chunk = event.getLevel().getChunkAt(event.getPos());
-        if(chunk.getPos().x != 0 || chunk.getPos().z != 0)
+        if(chunk.getPos().x < 0 || chunk.getPos().x >= side || chunk.getPos().z < 0 || chunk.getPos().z >= side)
             event.setCanceled(true);
 
     }
     @SubscribeEvent(priority = EventPriority.HIGH)
     static void onBlockBreakEvent(BlockEvent.BreakEvent event) {
-        double x = Math.floor(event.getPos().getX() / 16f);
-        double z = Math.floor(event.getPos().getZ() / 16f);
-        if(x != 0 || z != 0)
+        int side = APRandomizer.getChunkSide();
+        int cx = (int) Math.floor(event.getPos().getX() / 16.0);
+        int cz = (int) Math.floor(event.getPos().getZ() / 16.0);
+        if(cx < 0 || cx >= side || cz < 0 || cz >= side)
             event.setCanceled(true);
     }
 
     @SubscribeEvent
     static void onBlockPlaceEvent(BlockEvent.EntityPlaceEvent event) {
-        double x = Math.floor(event.getPos().getX() / 16f);
-        double z = Math.floor(event.getPos().getZ() / 16f);
-        if(x != 0 || z != 0)
+        int side = APRandomizer.getChunkSide();
+        int cx = (int) Math.floor(event.getPos().getX() / 16.0);
+        int cz = (int) Math.floor(event.getPos().getZ() / 16.0);
+        if(cx < 0 || cx >= side || cz < 0 || cz >= side)
             event.setCanceled(true);
     }
 

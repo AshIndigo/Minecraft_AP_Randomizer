@@ -152,6 +152,11 @@ public class APRandomizer {
         return goalManager;
     }
 
+    public static int getChunkSide() {
+        int count = (apmcData != null) ? Math.max(apmcData.chunk_count, 1) : 1;
+        return (int) Math.ceil(Math.sqrt(count));
+    }
+
     @SubscribeEvent
     public void onServerAboutToStart(ServerAboutToStartEvent event) {
         if (apmcData.state != APMCData.State.VALID) {
@@ -223,27 +228,59 @@ public class APRandomizer {
                 }
             }
 
-            for (int x = 0; x <= 15; x++) {
-                for (int z = 0; z <= 15; z++) {
+            int side = getChunkSide();
+            int maxBlock = side * 16;
+
+            // Place bedrock floor for all chunks
+            for (int x = 0; x < maxBlock; x++) {
+                for (int z = 0; z < maxBlock; z++) {
                     overworld.setBlock(new BlockPos(x, -64, z), Blocks.BEDROCK.defaultBlockState(), 2);
                 }
             }
 
-            StructureTemplate endChunk = overworld.getStructureManager().get(new ResourceLocation(MODID,"end1")).get();
-            BlockPos endChunkPos = new BlockPos(0,-63,0);
-            endChunk.placeInWorld(overworld,endChunkPos,endChunkPos,new StructurePlaceSettings(), RandomSource.create(),2);
+            // Dynamically discover layer variant templates
+            // Convention: layer_{layerNum}_{a,b,c,...}.nbt in structures folder
+            // 4 layers at fixed Y positions: layer_1 (top) to layer_4 (bottom)
+            int[] layerYPositions = {81, 33, -15, -63};
+            List<List<StructureTemplate>> layerTemplates = new ArrayList<>();
 
-            StructureTemplate netherChunk = overworld.getStructureManager().get(new ResourceLocation(MODID,"nether1")).get();
-            BlockPos netherChunkPos = new BlockPos(0,-15,0);
-            netherChunk.placeInWorld(overworld,netherChunkPos,netherChunkPos,new StructurePlaceSettings(), RandomSource.create(),2);
+            for (int l = 1; l <= layerYPositions.length; l++) {
+                List<StructureTemplate> variants = new ArrayList<>();
+                for (char v = 'a'; v <= 'z'; v++) {
+                    String name = "layer_" + l + "_" + v;
+                    Optional<StructureTemplate> template = overworld.getStructureManager()
+                        .get(new ResourceLocation(MODID, name));
+                    if (template.isPresent()) {
+                        variants.add(template.get());
+                        LOGGER.info("Loaded structure variant: {}", name);
+                    }
+                }
+                if (variants.isEmpty()) {
+                    LOGGER.warn("No variants found for layer_{}, chunks will be empty at Y={}", l, layerYPositions[l - 1]);
+                }
+                layerTemplates.add(variants);
+            }
 
-            StructureTemplate overworld1Chunk = overworld.getStructureManager().get(new ResourceLocation(MODID,"overworld1")).get();
-            BlockPos overworld1ChunkPos = new BlockPos(0,33,0);
-            overworld1Chunk.placeInWorld(overworld,overworld1ChunkPos,overworld1ChunkPos,new StructurePlaceSettings(), RandomSource.create(),2);
+            // Use world seed for deterministic variant selection per chunk
+            Random variantRng = new Random(apmcData.world_seed);
 
-            StructureTemplate overworld2Chunk = overworld.getStructureManager().get(new ResourceLocation(MODID,"overworld2")).get();
-            BlockPos overworld2ChunkPos = new BlockPos(0,81,0);
-            overworld2Chunk.placeInWorld(overworld,overworld2ChunkPos,overworld2ChunkPos,new StructurePlaceSettings(), RandomSource.create(),2);
+            for (int cx = 0; cx < side; cx++) {
+                for (int cz = 0; cz < side; cz++) {
+                    int ox = cx * 16;
+                    int oz = cz * 16;
+                    for (int l = 0; l < layerYPositions.length; l++) {
+                        List<StructureTemplate> variants = layerTemplates.get(l);
+                        if (!variants.isEmpty()) {
+                            StructureTemplate template = variants.get(variantRng.nextInt(variants.size()));
+                            template.placeInWorld(overworld, new BlockPos(ox, layerYPositions[l], oz),
+                                new BlockPos(ox, layerYPositions[l], oz),
+                                new StructurePlaceSettings(), RandomSource.create(), 2);
+                        }
+                    }
+                }
+            }
+
+            LOGGER.info("Dig mode: placed structures in {}x{} chunks (chunk_count={})", side, side, apmcData.chunk_count);
 
             overworld.setDefaultSpawnPos(new BlockPos(-3, 129, -3), 0f);
             jailCenter = overworld.getSharedSpawnPos();
